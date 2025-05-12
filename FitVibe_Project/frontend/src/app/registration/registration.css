@@ -1,0 +1,86 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* >>> ovo sprječava scroll */
+  }
+  
+  .registration-wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-image: url("/images/gymLanding.jpg");
+    background-size: cover;
+    background-position: center 20%; /* <<< pomjereno prema dolje */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  
+  .left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    background-color: transparent;
+  }
+  
+  .left-panel h1 {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .left-panel p {
+    font-size: 18px;
+    color: #ffffff;
+  }
+  
+  .form-panel {
+    flex: 1;
+    background: linear-gradient(to bottom right #628938,#53674b);
+    color: black;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+
+  }
+  
+  .form-panel h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+  }
+
+  select{
+    width: 100%;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+  }
+  
+  .primary-btn {
+    padding: 12px;
+    width: 100%;
+    background-color: #5c27fe;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .primary-btn:hover {
+    background-color: #431bc0;
+  }
+  

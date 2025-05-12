@@ -22,12 +22,15 @@ class Admin(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)  # dodano
 
 class Trainer(Base):
     __tablename__ = 'trainers'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
 
@@ -90,7 +93,7 @@ class TrainerPlan(Base):
     
     trainer = relationship('Trainer', back_populates='trainer_plans')
 
-# Relationships in Trainer class to link with other tables
+# Relacije tabela izmedu sebe (f.key)
 Trainer.workouts = relationship('Workout', back_populates='trainer')
 Trainer.trainer_plans = relationship('TrainerPlan', back_populates='trainer')
 User.user_challenges = relationship('UserChallenge', back_populates='user')

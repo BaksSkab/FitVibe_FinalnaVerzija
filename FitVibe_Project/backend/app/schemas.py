@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 
+class LoginData(BaseModel):
+    email: str
+    password: str
+
 class UserBase(BaseModel):
     first_name: str
     last_name: str
@@ -21,6 +25,7 @@ class User(UserBase):
 
 class AdminBase(BaseModel):
     email: str
+    full_name: str  # dodano
 
 class AdminCreate(AdminBase):
     password: str
@@ -31,8 +36,11 @@ class Admin(AdminBase):
     class Config:
         orm_mode = True
 
+
 class TrainerBase(BaseModel):
-    name: str
+    first_name: str
+    last_name: str
+    phone: str
     email: str
 
 class TrainerCreate(TrainerBase):
@@ -43,6 +51,7 @@ class Trainer(TrainerBase):
 
     class Config:
         orm_mode = True
+
 
 class WorkoutBase(BaseModel):
     title: str
