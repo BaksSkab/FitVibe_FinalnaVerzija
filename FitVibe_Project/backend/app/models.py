@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey,
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql import func
 
+
 Base = declarative_base()
 
 class User(Base):
@@ -15,6 +16,7 @@ class User(Base):
     gender = Column(String)
     password = Column(String, nullable=False)
     goal = Column(String)
+    
 
 class Admin(Base):
     __tablename__ = 'admins'
