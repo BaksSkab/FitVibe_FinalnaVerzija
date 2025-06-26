@@ -1,15 +1,130 @@
-.primary-btn {
-    padding: 10px 20px;
-    background-color: #375522;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .primary-btn:hover {
-    background-color: #628938;
-  }
-  
+/* Reset osnovnih margina i paddinga da nema bijelog prostora */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #1f2937;
+  font-family: Arial, sans-serif;
+  color: #cbd5e1;
+  overflow-x: hidden;
+}
+
+.user-container {
+  width: 100vw;
+  min-height: 100vh;
+  padding: 20px 40px; /* malo unutrašnjeg razmaka sa strana */
+  box-sizing: border-box;
+  background-color: #1f2937;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0f172a;
+  padding: 15px 25px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.header-buttons button {
+  background-color: #06b6d4;
+  border: none;
+  color: #0f172a;
+  padding: 8px 16px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.header-buttons button:hover {
+  background-color: #0891b2;
+}
+
+.motivation-box {
+  background-color: #0e7490;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.user-section {
+  margin-bottom: 30px;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.plan-card {
+  background-color: #334155;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #0f172a80;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px #06b6d4aa;
+}
+
+.plan-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #38bdf8;
+}
+
+.plan-card p {
+  margin: 5px 0;
+  color: #a1aebc;
+}
+
+.subscribe-button {
+  background-color: #06b6d4;
+  border: none;
+  color: #0f172a;
+  padding: 8px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.subscribe-button:hover {
+  background-color: #0891b2;
+}
+
+.subscribed {
+  background-color: #075985;
+  color: #38bdf8;
+  padding: 8px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: default;
+  border: none;
+}
+
+.edit-button {
+  background-color: #06b6d4;
+  border: none;
+  color: #0f172a;
+  padding: 8px 16px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.edit-button:hover {
+  background-color: #0891b2;
+}
