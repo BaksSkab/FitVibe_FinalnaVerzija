@@ -1,11 +1,13 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 
+# === LOGIN ===
 class LoginData(BaseModel):
     email: str
     password: str
 
+# === USER ===
 class UserBase(BaseModel):
     first_name: str
     last_name: str
@@ -19,82 +21,10 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-
     class Config:
         orm_mode = True
 
-class AdminBase(BaseModel):
-    email: str
-    full_name: str  # dodano
-
-class AdminCreate(AdminBase):
-    password: str
-
-class Admin(AdminBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class TrainerBase(BaseModel):
-    first_name: str
-    last_name: str
-    phone: str
-    email: str
-
-class TrainerCreate(TrainerBase):
-    password: str
-
-class Trainer(TrainerBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class WorkoutBase(BaseModel):
-    title: str
-    description: str
-    repetitions: Optional[int] = None
-
-class WorkoutCreate(WorkoutBase):
-    trainer_id: int
-
-class Workout(WorkoutBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-class ChallengeBase(BaseModel):
-    name: str
-    description: str
-    duration_days: int
-
-class ChallengeCreate(ChallengeBase):
-    pass
-
-class Challenge(ChallengeBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-class UserChallengeBase(BaseModel):
-    user_id: int
-    challenge_id: int
-    progress: Optional[int] = 0
-
-class UserChallengeCreate(UserChallengeBase):
-    pass
-
-class UserChallenge(UserChallengeBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
+# === MOTIVATIONAL MESSAGE ===
 class MotivationalMessageBase(BaseModel):
     content: str
     display_date: date
@@ -104,10 +34,10 @@ class MotivationalMessageCreate(MotivationalMessageBase):
 
 class MotivationalMessage(MotivationalMessageBase):
     id: int
-
     class Config:
         orm_mode = True
 
+# === PROGRESS ===
 class ProgressBase(BaseModel):
     user_id: int
     workout_id: int
@@ -119,10 +49,10 @@ class ProgressCreate(ProgressBase):
 
 class Progress(ProgressBase):
     id: int
-
     class Config:
         orm_mode = True
 
+# === TRAINER PLAN ===
 class TrainerPlanBase(BaseModel):
     trainer_id: int
     plan_name: str
@@ -132,6 +62,31 @@ class TrainerPlanCreate(TrainerPlanBase):
     pass
 
 class TrainerPlan(TrainerPlanBase):
+    id: int
+    workouts: List = []  # Frontend needs this for workouts list
+    class Config:
+        orm_mode = True
+
+# === USER-TRAINER PLAN (user subscription to plan) ===
+class UserTrainerPlanOut(BaseModel):
+    id: int
+    user_id: int
+    trainer_plan_id: int
+    subscribed_at: datetime
+    trainer_plan: TrainerPlan
+    class Config:
+        orm_mode = True
+# === TRAINER ===
+class TrainerBase(BaseModel):
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    email: str
+
+class TrainerCreate(TrainerBase):
+    password: str
+
+class Trainer(TrainerBase):
     id: int
 
     class Config:

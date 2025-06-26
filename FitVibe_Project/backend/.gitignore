@@ -1,0 +1,21 @@
+# Ignoriši virtualno okruženje
+venv/
+
+# Ignoriši Python cache fajlove
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignoriši konfiguracione fajlove editora
+*.vscode/
+.idea/
+
+# Ignoriši log fajlove
+*.log
+
+# Ignoriši podatke baze ako imaš lokalno
+*.sqlite3
+
+# Ignoriši fajlove konfiguracije okruženja
+.env

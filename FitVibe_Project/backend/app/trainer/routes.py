@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from app.trainer import services, models, schemas
-from app.dependencies import get_db
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_current_trainer
+
+from app import models  # <-- novi import glavnih modela (User, Trainer, TrainerPlan...)
+from app.trainer import services, schemas  # <-- samo schemas i services iz lokalnog foldera
+
+from app.dependencies import get_db, get_current_trainer
 from app.trainer.services import update_trainer_profile
-from app.trainer.models import Trainer
 
 
 router = APIRouter()

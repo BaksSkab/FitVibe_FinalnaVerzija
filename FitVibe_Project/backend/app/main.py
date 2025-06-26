@@ -9,6 +9,8 @@ import os
 
 from app.routers import auth
 from app.trainer.routes import router as trainer_router
+from app.user.routes import router as user_router
+
 from fastapi.staticfiles import StaticFiles
 
 # Učitavanje .env
@@ -39,7 +41,7 @@ app.add_middleware(
 # Uključivanje ruta
 app.include_router(auth.router)
 app.include_router(trainer_router, prefix="/trainer", tags=["Trainer"])
-
+app.include_router(user_router, prefix="/user", tags=["User"])
 
 # Statika
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
