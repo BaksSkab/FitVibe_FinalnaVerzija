@@ -2,17 +2,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from app import database, models
-from app.database import SessionLocal
-
-from fastapi.security import OAuth2PasswordBearer
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login/trainer")
-
-from jose import JWTError, jwt
-from app.database import get_db
+from app.database import SessionLocal, get_db
 from app import models
-import os
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 SECRET_KEY = "b60fc9f20ad54217892305ef62b946c9b2db1e94f3424a349a6d0251d9abf709"
 ALGORITHM = "HS256"

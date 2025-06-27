@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ```
 uvicorn app.main:app --reload
 ```
-Aplikacija će raditi na: http://localhost:8000
+Aplikacija će raditi na: http://localhost:8001
 
 ---
 

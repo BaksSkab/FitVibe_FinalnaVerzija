@@ -6,8 +6,18 @@ import axios from "axios";
 import "./trainer.css";
 
 import Link from "next/link";
-import { FaUserCircle, FaBell } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 
+function WorkoutImage({ image_filename, title }) {
+  const [src, setSrc] = useState(`/images/workouts/${image_filename}`);
+  const handleError = () => {
+    setSrc(`http://localhost:8001/static/workout_images/${image_filename}`);
+  };
+
+  return (
+    <img src={src} alt={title} className="workout-image" onError={handleError} loading="lazy"/>
+  );
+}
 const TrainerPage = () => {
   const [ime, setIme] = useState("");
   const [plans, setPlans] = useState([]);
@@ -29,265 +39,281 @@ const TrainerPage = () => {
   const [newWorkout, setNewWorkout] = useState({
     title: "",
     description: "",
-    repetitions: 0,
+    repetitions: "",
   });
   const [usersPerPlan, setUsersPerPlan] = useState({});
   const [userCounts, setUserCounts] = useState({});
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
+  const getToken = () => localStorage.getItem("token");
+
   const handleWorkoutToggle = (id) => {
-      setForm((prev) => {
-        const newWorkoutIds = [...prev.workout_ids];
-
-        if (newWorkoutIds.includes(id)) {
-          const filtered = newWorkoutIds.filter((wid) => wid !== id);
-          return { ...prev, workout_ids: filtered };
-        } else {
-          newWorkoutIds.push(id);
-          return { ...prev, workout_ids: newWorkoutIds };
-        }
-      });
-    };
-
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setError("");
-      setSuccess("");
-      try {
-        const token = localStorage.getItem("token");
-        await axios.post("http://localhost:8000/trainer/plans", form, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSuccess("Plan je uspješno kreiran!");
-        setForm({
-          plan_name: "",
-          description: "",
-          level: "",
-          goal: "",
-          category_id: "",
-          workout_ids: [],
-        });
-
-        const refreshed = await axios.get("http://localhost:8000/trainer/plans", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPlans(refreshed.data);
-      } catch (err) {
-        setError("Greška pri kreiranju plana.");
-        console.error(err);
+    setForm((prev) => {
+      const newWorkoutIds = [...prev.workout_ids];
+      if (newWorkoutIds.includes(id)) {
+        return {
+          ...prev,
+          workout_ids: newWorkoutIds.filter((wid) => wid !== id),
+        };
+      } else {
+        newWorkoutIds.push(id);
+        return { ...prev, workout_ids: newWorkoutIds };
       }
-    };
+    });
+  };
 
-    const fetchPlanDetail = async (planId) => {
-      const token = localStorage.getItem("token");
-      if (selectedPlanId === planId) {
-        setSelectedPlanId(null);
-        setSelectedWorkouts([]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    try {
+      const token = getToken();
+      if (!token) {
+        setError("Token not found!");
         return;
       }
-      try {
-        const res = await axios.get(`http://localhost:8000/trainer/plans/${planId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSelectedPlanId(planId);
-        setSelectedWorkouts(res.data.workouts);
-      } catch (err) {
-        console.error("Greška pri dohvaćanju detalja plana:", err);
+      await axios.post(
+        "http://localhost:8001/trainer/plans",
+        form,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSuccess("Plan je uspješno kreiran!");
+      setForm({
+        plan_name: "",
+        description: "",
+        level: "",
+        goal: "",
+        category_id: "",
+        workout_ids: [],
+      });
+      await fetchPlans();
+    } catch (err) {
+      setError("Greška pri kreiranju plana.");
+      console.error(err);
+    }
+  };
+
+  const fetchPlans = async () => {
+    try {
+      const token = getToken();
+      if (!token) {
+        setError("Token not found!");
+        return;
       }
-    };
+      const res = await axios.get(
+        "http://localhost:8001/trainer/plans",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPlans(res.data);
+      res.data.forEach((plan) => fetchUserCount(plan.id));
+    } catch (err) {
+      console.error(err);
+      setError("Ne mogu dohvatiti planove.");
+    }
+  };
 
-    const handleLogout = () => {
-      Cookies.remove("trainer_id");
-      Cookies.remove("first_name");
-      localStorage.removeItem("token");
-      window.location.href = "/";
-    };
-
-    const handleDelete = async (planId) => {
-      const token = localStorage.getItem("token");
-      try {
-        await axios.delete(`http://localhost:8000/trainer/plans/${planId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPlans((prev) => prev.filter((plan) => plan.id !== planId));
-      } catch (err) {
-        console.error("Greška pri brisanju plana:", err);
-        setError("Nije moguće obrisati plan.");
-      }
-    };
-
-    const handleAddWorkout = async (e) => {
-      e.preventDefault();
-      const token = localStorage.getItem("token");
-      try {
-        await axios.post("http://localhost:8000/trainer/workouts", newWorkout, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setNewWorkout({ title: "", description: "", repetitions: 0 });
-
-        const refreshed = await axios.get("http://localhost:8000/trainer/workouts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setWorkouts(refreshed.data);
-        setSuccess("Vježba uspješno dodana!");
-      } catch (err) {
-        console.error("Greška pri dodavanju vježbe:", err);
-        setError("Greška pri dodavanju vježbe.");
-      }
-    };
-
-    const handleRemoveWorkoutFromPlan = async (planId, workoutId) => {
-      const token = localStorage.getItem("token");
-      try {
-        await axios.delete(`http://localhost:8000/trainer/plans/${planId}/workouts/${workoutId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (selectedPlanId === planId) {
-          fetchPlanDetail(planId);
-        }
-      } catch (err) {
-        console.error("Greška pri uklanjanju vježbe iz plana:", err);
-        setError("Ne mogu ukloniti vježbu iz plana.");
-      }
-    };
-
-    const handleDeleteWorkout = async (workoutId) => {
-      const token = localStorage.getItem("token");
-      try {
-        await axios.delete(`http://localhost:8000/trainer/workouts/${workoutId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
-        if (selectedPlanId) {
-          fetchPlanDetail(selectedPlanId);
-        }
-      } catch (err) {
-        console.error("Greška pri brisanju vježbe:", err);
-        setError("Ne mogu obrisati vježbu.");
-      }
-    };
-
-    const openAddWorkoutsToPlan = (planId) => {
-      setEditingPlanId(planId);
-      setAdditionalWorkouts([]);
-    };
-
-    const handleAddToExistingPlan = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        await axios.post(
-          `http://localhost:8000/trainer/plans/${editingPlanId}/add_workouts`,
-          { workout_ids: additionalWorkouts },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setSuccess("Vježbe su dodane u plan!");
-        setAdditionalWorkouts([]);
-        setEditingPlanId(null);
-        fetchPlanDetail(editingPlanId);
-      } catch (err) {
-        console.error("Greška pri dodavanju vježbi u plan:", err);
-        setError("Greška pri dodavanju vježbi.");
-      }
-    };
-
-    const fetchUsersForPlan = async (planId) => {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await axios.get(`http://localhost:8000/trainer/plans/${planId}/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsersPerPlan((prev) => ({
-          ...prev,
-          [planId]: res.data,
-        }));
-      } catch (err) {
-        console.error("Greška pri dohvaćanju korisnika:", err);
-      }
-    };
-
-    const fetchUserCount = async (planId) => {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await axios.get(`http://localhost:8000/trainer/plans/${planId}/user_count`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUserCounts((prev) => ({ ...prev, [planId]: res.data.user_count }));
-      } catch (err) {
-        console.error("Greška pri dohvaćanju broja korisnika:", err);
-      }
-    };
-
-    const removeUserFromPlan = async (planId, userId) => {
-      const token = localStorage.getItem("token");
-      try {
-        await axios.delete(`http://localhost:8000/trainer/plans/${planId}/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        fetchUsersForPlan(planId);
-        fetchUserCount(planId); // osvježi broj
-      } catch (err) {
-        console.error("Greška pri uklanjanju korisnika:", err);
-      }
-    };
-
-    const fetchNotifications = async () => {
-      const token = localStorage.getItem("token");
+  const fetchWorkouts = async () => {
+    try {
+      const token = getToken();
       if (!token) return;
+      const res = await axios.get(
+        "http://localhost:8001/trainer/workouts",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setWorkouts(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-      try {
-        const res = await axios.get("http://localhost:8000/trainer/notifications", {
-          headers: { Authorization: "Bearer " + token },
-        });
+  const fetchNotifications = async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await axios.get(
+        "http://localhost:8001/trainer/notifications",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-        setNotifications(res.data);
-      } catch (err) {
-        console.error("Greška pri dohvaćanju notifikacija:", err);
-      }
-    };
+  const fetchPlanDetail = async (planId) => {
+    const token = getToken();
+    if (!token) return;
+    if (selectedPlanId === planId) {
+      setSelectedPlanId(null);
+      setSelectedWorkouts([]);
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:8001/trainer/plans/${planId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSelectedPlanId(planId);
+      setSelectedWorkouts(res.data.workouts);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    Cookies.remove("trainer_id");
+    Cookies.remove("first_name");
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
+
+  const handleDelete = async (planId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await axios.delete(
+        `http://localhost:8001/trainer/plans/${planId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPlans((prev) => prev.filter((plan) => plan.id !== planId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddWorkout = async (e) => {
+  e.preventDefault();
+  const token = getToken();
+  if (!token) return;
+
+  const formData = new FormData();
+  formData.append("title", newWorkout.title);
+  formData.append("description", newWorkout.description);
+  formData.append("repetitions", newWorkout.repetitions);
+  if (newWorkout.image) {
+    formData.append("image", newWorkout.image);
+  }
+
+  try {
+    await axios.post("http://localhost:8001/trainer/workouts", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",  // Ovo je važno!
+      },
+    });
+    setNewWorkout({ title: "", description: "", repetitions: 0, image: null });
+    setSuccess("Vježba dodana!");
+    await fetchWorkouts(); // Ponovo učitaj listu vježbi
+  } catch (error) {
+    console.error(error);
+    setError("Neuspješan upload vježbe.");
+  }
+};
+
+
+  const handleRemoveWorkoutFromPlan = async (planId, workoutId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await axios.delete(
+        `http://localhost:8001/trainer/plans/${planId}/workouts/${workoutId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (selectedPlanId === planId) fetchPlanDetail(planId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteWorkout = async (workoutId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await axios.delete(
+        `http://localhost:8001/trainer/workouts/${workoutId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
+      if (selectedPlanId) fetchPlanDetail(selectedPlanId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openAddWorkoutsToPlan = (planId) => {
+    setEditingPlanId(planId);
+    setAdditionalWorkouts([]);
+  };
+
+  const handleAddToExistingPlan = async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await axios.post(
+        `http://localhost:8001/trainer/plans/${editingPlanId}/add_workouts`,
+        { workout_ids: additionalWorkouts },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSuccess("Dodane vježbe!");
+      setAdditionalWorkouts([]);
+      setEditingPlanId(null);
+      fetchPlanDetail(editingPlanId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchUsersForPlan = async (planId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await axios.get(
+        `http://localhost:8001/trainer/plans/${planId}/users`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUsersPerPlan((prev) => ({ ...prev, [planId]: res.data }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchUserCount = async (planId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await axios.get(
+        `http://localhost:8001/trainer/plans/${planId}/user_count`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserCounts((prev) => ({ ...prev, [planId]: res.data.user_count }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const removeUserFromPlan = async (planId, userId) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await axios.delete(
+        `http://localhost:8001/trainer/plans/${planId}/users/${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchUsersForPlan(planId);
+      fetchUserCount(planId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     const storedIme = Cookies.get("first_name");
     if (storedIme) setIme(storedIme);
-
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const fetchPlans = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/trainer/plans", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPlans(res.data);
-
-        res.data.forEach((plan) => {
-          fetchUserCount(plan.id);
-        });
-      } catch (err) {
-        setError("Ne mogu dohvatiti planove.");
-        console.error(err);
-      }
-    };
-
-    const fetchWorkouts = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/trainer/workouts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setWorkouts(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     fetchPlans();
     fetchWorkouts();
     fetchNotifications();
-  
-  },[]);
+  }, []);
   
 
 return (
@@ -519,7 +545,7 @@ return (
                   onClick={() => handleWorkoutToggle(w.id)}>
                 <input type="checkbox" checked={isChecked} readOnly style={{ display: "none" }} />
                 <h4>{w.title}</h4>
-                <img src={`/images/workouts/${w.image_filename}`} alt={w.title} className="workout-image"/>
+                <WorkoutImage image_filename={w.image_filename} title={w.title} />
                 <p>{w.description}</p>
                 <p>
                   <em>{w.repetitions} repetitions</em>

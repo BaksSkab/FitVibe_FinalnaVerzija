@@ -110,3 +110,5 @@ class NotificationOut(NotificationBase):
 
     class Config:
         from_attributes = True
+        
+

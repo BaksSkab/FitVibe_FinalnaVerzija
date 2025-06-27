@@ -111,7 +111,7 @@ def login(data: LoginData, db: Session = Depends(get_db)):
     # 2. Pokušaj kao trainer
     trainer = db.query(Trainer).filter(Trainer.email == data.email).first()
     if trainer and verify_password(data.password, trainer.password):  # ✅
-        token = create_access_token({"sub": trainer.email, "role": "trainer"})
+        token = create_access_token({"sub": trainer.email, "id": trainer.id,"role": "trainer"})
         return {
             "access_token": token,
             "first_name": trainer.first_name,
