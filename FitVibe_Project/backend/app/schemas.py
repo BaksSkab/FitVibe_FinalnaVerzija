@@ -52,18 +52,27 @@ class Progress(ProgressBase):
     class Config:
         orm_mode = True
 
+# === TRAINER INFO (za prikaz trenera unutar plana) ===
+class TrainerInfo(BaseModel):
+    first_name: str
+    last_name: str
+
+    class Config:
+        orm_mode = True
+
 # === TRAINER PLAN ===
 class TrainerPlanBase(BaseModel):
     trainer_id: int
     plan_name: str
     description: Optional[str] = None
-
-class TrainerPlanCreate(TrainerPlanBase):
-    pass
+    level: Optional[str] = None
+    goal: Optional[str] = None
 
 class TrainerPlan(TrainerPlanBase):
     id: int
-    workouts: List = []  # Frontend needs this for workouts list
+    workouts: List = []  # ako trebaš za frontend, možeš kasnije detaljnije tipizirati
+    trainer: Optional[TrainerInfo] = None  # uključujemo podatke o treneru
+
     class Config:
         orm_mode = True
 
@@ -74,8 +83,10 @@ class UserTrainerPlanOut(BaseModel):
     trainer_plan_id: int
     subscribed_at: datetime
     trainer_plan: TrainerPlan
+
     class Config:
         orm_mode = True
+
 # === TRAINER ===
 class TrainerBase(BaseModel):
     first_name: str

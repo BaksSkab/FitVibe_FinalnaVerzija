@@ -62,17 +62,21 @@ def subscribe_to_plan(trainer_plan_id: int, db: Session = Depends(get_db), user:
 # === USER'S SUBSCRIBED PLANS ===
 @router.get("/my-plans", response_model=list[schemas.UserTrainerPlanOut])
 def get_user_plans(db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
-    return (
+    # Koristimo joinedload da bismo dobili i podatke o treneru i vježbama uz plan
+    plans = (
         db.query(models.UserTrainerPlan)
         .options(
             joinedload(models.UserTrainerPlan.trainer_plan)
-            .joinedload(models.TrainerPlan.trainer),
+            .joinedload(models.TrainerPlan.trainer),   # učitavamo trenera
             joinedload(models.UserTrainerPlan.trainer_plan)
-            .joinedload(models.TrainerPlan.workouts)
+            .joinedload(models.TrainerPlan.workouts)   # ako trebaš vježbe
         )
         .filter(models.UserTrainerPlan.user_id == user.id)
         .all()
     )
+    # Debug print (možeš obrisati poslije)
+    print(f"User {user.id} plans with trainer info: {plans}")
+    return plans
 
 # === UNSUBSCRIBE FROM PLAN ===
 @router.delete("/my-plans/{trainer_plan_id}")
