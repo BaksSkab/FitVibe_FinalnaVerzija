@@ -132,3 +132,23 @@ def login(data: LoginData, db: Session = Depends(get_db)):
 
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
+
+@router.post("/reset-password")
+def reset_password(email: str = Body(...), new_password: str = Body(...), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        user.password = get_password_hash(new_password)
+        db.commit()
+        return {"msg": "Password updated"}
+    trainer = db.query(Trainer).filter(Trainer.email == email).first()
+    if trainer:
+        trainer.password = get_password_hash(new_password)
+        db.commit()
+        return {"msg": "Password updated"}
+    admin = db.query(Admin).filter(Admin.email == email).first()
+    if admin:
+        admin.password = get_password_hash(new_password)
+        db.commit()
+        return {"msg": "Password updated"}
+
+    raise HTTPException(status_code=404, detail="Email not found")

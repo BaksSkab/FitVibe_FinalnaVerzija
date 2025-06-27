@@ -84,23 +84,78 @@ body, html {
     background-color: #1bc09f;
   }
   
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
   .registration-wrapper {
+    display: flex;
     flex-direction: column;
     height: auto;
+    min-height: 100vh;
     overflow-y: auto;
   }
 
-  .left-panel,
-  .form-panel {
-    flex: none;
+  .left-panel {
     width: 100%;
-    padding: 30px;
+    padding: 30px 20px;
     text-align: center;
   }
 
   .left-panel h1 {
-    font-size: 28px;
+    font-size: 26px;
+    margin-bottom: 15px;
+  }
+
+  .left-panel p {
+    font-size: 14px;
+  }
+
+  .form-panel {
+    width: 90%;
+    margin: 0 auto 40px auto;
+    padding: 30px 20px;
+    border-radius: 10px;
+  }
+
+  .form-panel h2 {
+    font-size: 22px;
+  }
+
+  input,
+  select {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .primary-btn {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  footer {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .registration-wrapper {
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 100vh;
+  }
+
+  .left-panel,
+  .form-panel {
+    flex: 1;
+    padding: 40px;
+  }
+
+  .left-panel h1 {
+    font-size: 32px;
   }
 
   .left-panel p {
@@ -110,14 +165,9 @@ body, html {
   .form-panel h2 {
     font-size: 24px;
   }
-
-  input,
-  select,
-  .primary-btn {
-    font-size: 14px;
-    padding: 10px;
-  }
 }
+
+
 
 /* Custom center toast */
 .custom-toast {
@@ -125,4 +175,52 @@ body, html {
   color: #fff !important;
   font-size: 18px;
   text-align: center;
+}
+
+
+/* === ANIMATIONS === */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeSlideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-slide-up {
+  animation: fadeSlideUp 0.8s ease forwards;
+}
+
+.fade-slide-right {
+  animation: fadeSlideRight 0.8s ease forwards;
+}
+
+.fade-slide-left {
+  animation: fadeSlideLeft 0.8s ease forwards;
 }

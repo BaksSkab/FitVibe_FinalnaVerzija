@@ -136,3 +136,8 @@ class TrainerPlan(TrainerPlanBase):
 
     class Config:
         orm_mode = True
+
+class PasswordChangeRequest(BaseModel):
+    email: str
+    old_password: str
+    new_password: str

@@ -25,7 +25,7 @@ const LoginForm = () => {
       Cookies.set("first_name", response.data.first_name);
       localStorage.setItem("token", response.data.access_token);
 
-      toast.success("Login uspješan!");
+      toast.success("Login successful !");
 
       setTimeout(() => {
         if (response.data.role === "trainer") {
@@ -39,30 +39,30 @@ const LoginForm = () => {
 
     } catch (err) {
       console.error(err.response?.data || err.message);
-      toast.error("Login nije uspio! Provjerite email ili lozinku.");
+      toast.error("Login failed! Provjerite email ili lozinku.");
     }
   };
 
   return (
     <>
       <div className="login-wrapper">
-        <div className="video-panel">
+        <div className="video-panel fade-slide-up">
           <video autoPlay loop muted playsInline>
             <source src="/videos/fifthVideo.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
-        <div className="login-panel">
-          <h2>Login</h2>
-          <p>Enter your account details to enter our platform.</p>
+        <div className="login-panel fade-slide-right">
+          <h2 className="fade-slide-up">Login</h2>
+          <p className="fade-slide-up">Enter your account details to enter our platform.</p>
 
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} />
-          <div className="forgot">Forgot password?</div>
+          <input className="fade-slide-right" type="email" name="email" placeholder="Email" onChange={handleChange} />
+          <input className="fade-slide-right" type="password" name="password" placeholder="Password" onChange={handleChange} />
+          <div className="forgot fade-slide-up">Forgot password?</div>
 
-          <button className="primary-btn" onClick={handleLogin}>Login</button>
+          <button className="primary-btn fade-slide-left" onClick={handleLogin}>Login</button>
 
-          <div className="signup-link">
+          <div className="signup-link fade-slide-up">
             Don’t have an account? <a href="/registration">Create an account</a>
           </div>
         </div>
