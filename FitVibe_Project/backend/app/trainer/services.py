@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.trainer import models, schemas
 from typing import List
 from app.trainer.models import TrainerNotification
+from fastapi import HTTPException
 
 def get_trainer_plans(db: Session, trainer_id: int):
     return db.query(models.TrainerPlan).filter(models.TrainerPlan.trainer_id == trainer_id).all()

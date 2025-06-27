@@ -6,7 +6,8 @@ from typing import List
 from app.dependencies import get_current_trainer
 from app.trainer.services import update_trainer_profile
 from app.trainer.models import Trainer
-
+import os
+import shutil
 
 router = APIRouter()
 
@@ -26,9 +27,41 @@ def get_all_workouts(db: Session = Depends(get_db)):
     return services.get_all_workouts(db)
 
 
+from fastapi import Form
+
 @router.post("/workouts")
-def create_workout(workout: schemas.WorkoutCreate, db: Session = Depends(get_db), trainer=Depends(get_current_trainer)):
-    return services.create_workout(db, workout, trainer.id)
+def create_workout_with_image(
+    title: str = Form(...),
+    description: str = Form(...),
+    repetitions: int = Form(...),
+    image: UploadFile = File(None),
+    db: Session = Depends(get_db),
+    trainer=Depends(get_current_trainer)
+):
+    image_url = None
+    if image:
+        upload_dir = "app/static/workout_images"
+        os.makedirs(upload_dir, exist_ok=True)
+
+        filename = f"workout_{trainer.id}_{image.filename}"
+        filepath = os.path.join(upload_dir, filename)
+
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+
+        image_url = f"/static/workout_images/{filename}"
+
+    workout = models.Workout(
+        title=title,
+        description=description,
+        repetitions=repetitions,
+        image_filename=filename,
+        trainer_id=trainer.id
+    )
+    db.add(workout)
+    db.commit()
+    db.refresh(workout)
+    return workout
 
 
 @router.post("/plans", response_model=schemas.TrainerPlanOut)
