@@ -4,6 +4,7 @@ from app import models, schemas
 from app.dependencies import get_current_user, get_db
 from datetime import date, datetime
 
+
 router = APIRouter()
 
 # === USER PROFILE ===
@@ -121,13 +122,14 @@ def add_progress(
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user)
 ):
-    new_progress = models.Progress(
-        user_id=user.id,
-        workout_id=workout_id,
-        actual_result=actual_result,
-        created_at=datetime.utcnow()
-    )
-    db.add(new_progress)
-    db.commit()
-    db.refresh(new_progress)
-    return {"message": "Progress added successfully", "progress_id": new_progress.id}
+   new_progress = models.Progress(
+    user_id=user.id,
+    workout_id=progress.workout_id,
+    actual_result=progress.actual_result,
+    created_at=datetime.utcnow()
+)
+   db.add(new_progress)
+   db.commit()
+   db.refresh(new_progress)
+   return {"message": "Progress added successfully", "progress_id": new_progress.id}
+

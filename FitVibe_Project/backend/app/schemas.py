@@ -38,19 +38,25 @@ class MotivationalMessage(MotivationalMessageBase):
         orm_mode = True
 
 # === PROGRESS ===
+# === PROGRESS ===
 class ProgressBase(BaseModel):
     user_id: int
     workout_id: int
     actual_result: Optional[str] = None
     created_at: Optional[datetime] = None
 
-class ProgressCreate(ProgressBase):
-    pass
+class ProgressCreate(BaseModel):
+    workout_id: int
+    actual_result: str   # koristi isti naziv kao u bazi i modelu
+
+    class Config:
+        orm_mode = True
 
 class Progress(ProgressBase):
     id: int
     class Config:
         orm_mode = True
+
 
 # === TRAINER INFO (za prikaz trenera unutar plana) ===
 class TrainerInfo(BaseModel):

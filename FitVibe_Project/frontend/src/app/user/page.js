@@ -16,6 +16,9 @@ export default function UserPage() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPlanDetails, setShowPlanDetails] = useState(false);
 
+  // Novi state za unos progres-a po vježbi (id vježbe -> unos)
+  const [newProgress, setNewProgress] = useState({});
+
   const router = useRouter();
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -110,6 +113,47 @@ export default function UserPage() {
     }
   };
 
+  // Funkcija za promjenu unosa za određenu vježbu
+  const handleProgressChange = (workoutId, value) => {
+    setNewProgress(prev => ({
+      ...prev,
+      [workoutId]: value,
+    }));
+  };
+
+  // Funkcija za slanje progres-a na backend
+  const submitProgress = async (workoutId) => {
+    const progressValue = newProgress[workoutId];
+    if (!progressValue) {
+      toast.error("Please enter progress before submitting.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/user/progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          workout_id: workoutId,
+          actual_result: progressValue,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Progress saved successfully!");
+        setNewProgress(prev => ({ ...prev, [workoutId]: "" }));
+        fetchData();
+      } else {
+        toast.error("Failed to save progress.");
+      }
+    } catch (error) {
+      toast.error("Server error while saving progress.");
+    }
+  };
+
   const handleEditProfile = () => {
     router.push("/user/profile");
   };
@@ -125,40 +169,51 @@ export default function UserPage() {
 
   // Prikaz detalja plana (koristi polja iz selectedPlan.trainer_plan)
   if (showPlanDetails && selectedPlan) {
-  const plan = selectedPlan.trainer_plan;
-  return (
-    <div className="plan-detail-container">
-      <button
-        onClick={() => {
-          setShowPlanDetails(false);
-          setSelectedPlan(null);
-        }}
-        className="edit-button"
-      >
-        ← Back to plans
-      </button>
-      <h2>{plan.plan_name}</h2>
-      <p>{plan.description}</p>
-      <p><strong>Level:</strong> {plan.level}</p>
-      <p><strong>Goal:</strong> {plan.goal}</p>
-      <p><strong>Trainer:</strong> {plan.trainer ? `${plan.trainer.first_name} ${plan.trainer.last_name}` : "Unknown"}</p>
-      <h3>Workouts:</h3>
-      {plan.workouts && plan.workouts.length > 0 ? (
-        <ul>
-          {plan.workouts.map(w => (
-            <li key={w.id}>
-              <strong>{w.title}</strong> - {w.description} ({w.repetitions} reps)
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No workouts assigned to this plan.</p>
-      )}
-    </div>
-  );
-}
+    const plan = selectedPlan.trainer_plan;
+    return (
+      <div className="plan-detail-container">
+        <button
+          onClick={() => {
+            setShowPlanDetails(false);
+            setSelectedPlan(null);
+          }}
+          className="edit-button"
+        >
+          ← Back to plans
+        </button>
+        <h2>{plan.plan_name}</h2>
+        <p>{plan.description}</p>
+        <p><strong>Level:</strong> {plan.level}</p>
+        <p><strong>Goal:</strong> {plan.goal}</p>
+        <p><strong>Trainer:</strong> {plan.trainer ? `${plan.trainer.first_name} ${plan.trainer.last_name}` : "Unknown"}</p>
+        <h3>Workouts:</h3>
+        {plan.workouts && plan.workouts.length > 0 ? (
+          <ul>
+            {plan.workouts.map(w => (
+              <li key={w.id} style={{ marginBottom: "1rem" }}>
+                <strong>{w.title}</strong> - {w.description} ({w.repetitions} reps)
+                <div style={{ marginTop: "0.5rem" }}>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Enter your progress"
+                    value={newProgress[w.id] || ""}
+                    onChange={(e) => handleProgressChange(w.id, e.target.value)}
+                    style={{ marginRight: "0.5rem" }}
+                  />
+                  <button onClick={() => submitProgress(w.id)}>Add Result</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No workouts assigned to this plan.</p>
+        )}
+      </div>
+    );
+  }
 
-  // Standardni prikaz liste korisnika i planova
+  // Standardni prikaz liste korisnika i planova sa dodatkom Progress sekcije
   return (
     <div className="user-container">
       <div className="user-header">
@@ -221,6 +276,24 @@ export default function UserPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* User Progress */}
+      <section className="user-section">
+        <h2>📈 Your Progress</h2>
+        {progress.length > 0 ? (
+          <ul className="progress-list">
+            {progress.map((p) => (
+              <li key={p.id} className="progress-item">
+                <strong>{p.workout?.title || "Workout"}</strong>: {p.actual_result}
+                <br />
+                <small>{new Date(p.created_at).toLocaleString()}</small>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>You have not added any progress yet.</p>
+        )}
       </section>
     </div>
   );

@@ -1,0 +1,16 @@
+[33mb675e2f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32muser[m[33m)[m Resolve conflict in app/trainer/routes.py
+[33m23a9bdc[m Remove compiled .pyc files from app/routers/__pycache__
+[33mf0bf23f[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m nove izmjene Ajsa
+[33m835c2af[m Remove compiled Python files (.pyc) from repository
+[33m7d25a76[m Update README.md
+[33m1a62dd8[m Use LFS for video files
+[33m890e8fa[m Uredio sam login registraciju i landing
+[33md4cca9c[m[33m ([m[1;32mbackup-user-profile[m[33m)[m fixing css
+[33me4fc42d[m Fixed detailed view for subscribed plan cards
+[33m7e40abc[m Bugfix: trainer info and plans display on user page
+[33m653b25c[m[33m ([m[1;31morigin/user[m[33m)[m izmjena
+[33med0db8e[m Add .gitignore to ignore venv and other files in backend
+[33m42f5180[m .
+[33mdbc533e[m Ajsa
+[33mf822d75[m Zamijenjen frontend sa Next.js verzijom, ažuriran backend
+[33ma2dab4e[m Initial commit

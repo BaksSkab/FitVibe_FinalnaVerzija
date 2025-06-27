@@ -200,3 +200,73 @@ html, body {
 .plan-detail-container button.edit-button:hover {
   background-color: #0284c7;
 }
+/* Stil za input polje unosa progresа */
+.plan-detail-container input[type="number"] {
+  width: 120px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.plan-detail-container input[type="number"]:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 8px #60a5faaa;
+}
+
+/* Stil za dugme "Add Result" pored inputa */
+.plan-detail-container button {
+  background-color: #06b6d4;
+  color: #0f172a;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-left: 8px;
+}
+
+.plan-detail-container button:hover {
+  background-color: #0891b2;
+}
+
+/* Dodatni margin bottom za svaki <li> u listi vježbi da se ne lijepi previše */
+.plan-detail-container ul li {
+  margin-bottom: 1.5rem;
+}
+.progress-list {
+  list-style-type: none;
+  padding-left: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background-color: #1e293b;
+  padding: 15px;
+  color: #cbd5e1;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.progress-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #334155;
+  line-height: 1.4;
+}
+
+.progress-item:last-child {
+  border-bottom: none;
+}
+
+.progress-item strong {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.progress-item small {
+  color: #94a3b8;
+}
