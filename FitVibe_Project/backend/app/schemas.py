@@ -60,6 +60,17 @@ class TrainerInfo(BaseModel):
     class Config:
         orm_mode = True
 
+# === WORKOUT ===
+class Workout(BaseModel):
+    id: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    repetitions: Optional[int] = None
+    image_filename: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
 # === TRAINER PLAN ===
 class TrainerPlanBase(BaseModel):
     trainer_id: int
@@ -70,7 +81,7 @@ class TrainerPlanBase(BaseModel):
 
 class TrainerPlan(TrainerPlanBase):
     id: int
-    workouts: List = []  # ako trebaš za frontend, možeš kasnije detaljnije tipizirati
+    workouts: List[Workout] = []  # Tipizirano liste vježbi
     trainer: Optional[TrainerInfo] = None  # uključujemo podatke o treneru
 
     class Config:

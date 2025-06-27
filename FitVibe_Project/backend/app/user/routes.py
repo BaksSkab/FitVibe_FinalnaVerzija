@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body, Path
 from sqlalchemy.orm import Session, joinedload
 from app import models, schemas
 from app.dependencies import get_current_user, get_db
@@ -48,6 +48,33 @@ def get_user_progress(db: Session = Depends(get_db), user: models.User = Depends
 def get_all_plans(db: Session = Depends(get_db)):
     return db.query(models.TrainerPlan).all()
 
+# === PLAN DETAILS BY ID (for subscribed user) ===
+@router.get("/plans/{plan_id}", response_model=schemas.UserTrainerPlanOut)
+def get_plan_detail(
+    plan_id: int = Path(..., description="ID of the trainer plan"),
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user)
+):
+    subscription = (
+        db.query(models.UserTrainerPlan)
+        .options(
+            joinedload(models.UserTrainerPlan.trainer_plan)
+            .joinedload(models.TrainerPlan.trainer),
+            joinedload(models.UserTrainerPlan.trainer_plan)
+            .joinedload(models.TrainerPlan.workouts)
+        )
+        .filter(
+            models.UserTrainerPlan.user_id == user.id,
+            models.UserTrainerPlan.trainer_plan_id == plan_id
+        )
+        .first()
+    )
+
+    if not subscription:
+        raise HTTPException(status_code=404, detail="Plan not found or not subscribed.")
+
+    return subscription
+
 # === SUBSCRIBE TO PLAN ===
 @router.post("/plans/{trainer_plan_id}/subscribe")
 def subscribe_to_plan(trainer_plan_id: int, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
@@ -62,20 +89,18 @@ def subscribe_to_plan(trainer_plan_id: int, db: Session = Depends(get_db), user:
 # === USER'S SUBSCRIBED PLANS ===
 @router.get("/my-plans", response_model=list[schemas.UserTrainerPlanOut])
 def get_user_plans(db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
-    # Koristimo joinedload da bismo dobili i podatke o treneru i vježbama uz plan
     plans = (
         db.query(models.UserTrainerPlan)
         .options(
             joinedload(models.UserTrainerPlan.trainer_plan)
-            .joinedload(models.TrainerPlan.trainer),   # učitavamo trenera
+            .joinedload(models.TrainerPlan.trainer),
             joinedload(models.UserTrainerPlan.trainer_plan)
-            .joinedload(models.TrainerPlan.workouts)   # ako trebaš vježbe
+            .joinedload(models.TrainerPlan.workouts)
         )
         .filter(models.UserTrainerPlan.user_id == user.id)
         .all()
     )
-    # Debug print (možeš obrisati poslije)
-    print(f"User {user.id} plans with trainer info: {plans}")
+    print(f"User {user.id} plans with trainer info: {plans}")  # možeš ukloniti kasnije
     return plans
 
 # === UNSUBSCRIBE FROM PLAN ===
