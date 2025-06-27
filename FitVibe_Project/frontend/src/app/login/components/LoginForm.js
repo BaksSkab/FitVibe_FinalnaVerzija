@@ -5,10 +5,10 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import "../login.css";
 
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
-  const [role, setRole] = useState("user");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -17,56 +17,58 @@ const LoginForm = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/auth/login/${role}`, formData);
-      
-  
-      Cookies.set("trainer_id", response.data.trainer_id);
+      const response = await axios.post("http://localhost:8001/auth/login", formData);
+
+      Cookies.set("user_id", response.data.user_id || "");
+      Cookies.set("trainer_id", response.data.trainer_id || "");
+      Cookies.set("admin_id", response.data.admin_id || "");
       Cookies.set("first_name", response.data.first_name);
       localStorage.setItem("token", response.data.access_token);
-  
-      if (role === "trainer") {
-        window.location.href = "/trainer";
-      }
-      else if(role=="user"){
-        window.location.href="/user";
-      }
-      else if(role=="admin"){
-        window.location.href="/admin";
-      }
-  
+
+      toast.success("Login uspješan!");
+
+      setTimeout(() => {
+        if (response.data.role === "trainer") {
+          window.location.href = "/trainer";
+        } else if (response.data.role === "user") {
+          window.location.href = "/user";
+        } else if (response.data.role === "admin") {
+          window.location.href = "/admin";
+        }
+      }, 1000);
+
     } catch (err) {
       console.error(err.response?.data || err.message);
-      alert("Login nije uspio!");
+      toast.error("Login nije uspio! Provjerite email ili lozinku.");
     }
   };
-  
 
   return (
-    <div className="login-wrapper">
-      <div className="image-panel">
-  <img src="/images/gym2.jpg" alt="gym" />
-</div>
-      <div className="login-panel">
-        <h2>Login</h2>
-        <p>Enter your account details to enter our platform.</p>
+    <>
+      <div className="login-wrapper">
+        <div className="video-panel">
+          <video autoPlay loop muted playsInline>
+            <source src="/videos/fifthVideo.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div className="login-panel">
+          <h2>Login</h2>
+          <p>Enter your account details to enter our platform.</p>
 
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} />
-        <div className="forgot">Forgot password?</div>
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} />
+          <div className="forgot">Forgot password?</div>
 
-        <select onChange={(e) => setRole(e.target.value)}>
-  <option value="user">Korisnik</option>
-  <option value="trainer">Trener</option>
-  <option value="admin">Admin</option>
-</select>
+          <button className="primary-btn" onClick={handleLogin}>Login</button>
 
-        <button className="primary-btn" onClick={handleLogin}>Login</button>
-
-        <div className="signup-link">
-          Don’t have an account? <a href="/register">Create an account</a>
+          <div className="signup-link">
+            Don’t have an account? <a href="/registration">Create an account</a>
+          </div>
         </div>
       </div>
-    </div>
+      <ToastContainer position="top-right" autoClose={3000} pauseOnHover={false} />
+    </>
   );
 };
 

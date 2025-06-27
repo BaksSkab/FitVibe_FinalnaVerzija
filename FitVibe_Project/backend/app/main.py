@@ -6,10 +6,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-
 from app.routers import auth
 from app.trainer.routes import router as trainer_router
 from fastapi.staticfiles import StaticFiles
+from app.models import User, Trainer, Admin
+
 
 # Učitavanje .env
 env_path = Path(__file__).parent.parent / ".env"

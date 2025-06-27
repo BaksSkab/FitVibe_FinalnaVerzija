@@ -3,6 +3,6 @@ uvicorn
 sqlalchemy
 pydantic
 passlib[bcrypt]
-js_cookies za frontend
+#js_cookies za frontend
 
 

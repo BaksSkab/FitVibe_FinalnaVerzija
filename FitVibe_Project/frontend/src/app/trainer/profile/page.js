@@ -25,7 +25,7 @@ const TrainerProfile = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:8000/trainer/profile", {
+      .get("http://localhost:8001/trainer/profile", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -61,7 +61,7 @@ const TrainerProfile = () => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      await axios.put("http://localhost:8000/trainer/profile", form, {
+      await axios.put("http://localhost:8001/trainer/profile", form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess("Profile updated successfully!");

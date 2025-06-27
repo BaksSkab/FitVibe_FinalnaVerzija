@@ -10,6 +10,10 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
+from app.models import User, Trainer, Admin
+from app.schemas import LoginData
+
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -46,7 +50,6 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 # ---------------- Registracija ----------------
-
 @router.post("/register/user", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
@@ -67,6 +70,9 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+    
+ 
+
 
 @router.post("/register/trainer", response_model=schemas.Trainer)
 def register_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_db)):
@@ -89,54 +95,40 @@ def register_trainer(trainer: schemas.TrainerCreate, db: Session = Depends(get_d
 
 # ---------------- Login ----------------
 
-@router.post("/login/user")
-def login_user(form_data: schemas.LoginData, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == form_data.email).first()
-    if not user or not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
+@router.post("/login")
+def login(data: LoginData, db: Session = Depends(get_db)):
+    # 1. Pokušaj kao user
+    user = db.query(User).filter(User.email == data.email).first()
+    if user and verify_password(data.password, user.password):  # ✅ ispravno polje
+        token = create_access_token({"sub": user.email, "role": "user"})
+        return {
+            "access_token": token,
+            "first_name": user.first_name,
+            "role": "user",
+            "user_id": user.id
+        }
 
-    access_token = create_access_token(data={"sub": user.email, "role": "user", "id": user.id})
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user_id": user.id,
-        "first_name": user.first_name
-    }
+    # 2. Pokušaj kao trainer
+    trainer = db.query(Trainer).filter(Trainer.email == data.email).first()
+    if trainer and verify_password(data.password, trainer.password):  # ✅
+        token = create_access_token({"sub": trainer.email, "role": "trainer"})
+        return {
+            "access_token": token,
+            "first_name": trainer.first_name,
+            "role": "trainer",
+            "trainer_id": trainer.id
+        }
 
+    # 3. Pokušaj kao admin
+    admin = db.query(Admin).filter(Admin.email == data.email).first()
+    if admin and verify_password(data.password, admin.password):  # ✅
+        token = create_access_token({"sub": admin.email, "role": "admin"})
+        return {
+            "access_token": token,
+            "first_name": admin.full_name,
+            "role": "admin",
+            "admin_id": admin.id
+        }
 
-@router.post("/login/trainer")
-def login_trainer(form_data: schemas.LoginData, db: Session = Depends(get_db)):
-    trainer = db.query(models.Trainer).filter(models.Trainer.email == form_data.email).first()
-    if not trainer or not verify_password(form_data.password, trainer.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-
-    access_token = create_access_token(data={"sub": trainer.email, "role": "trainer", "id": trainer.id})
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "trainer_id": trainer.id,
-        "first_name": trainer.first_name
-    }
-
-
-@router.post("/login/admin")
-def login_admin(form_data: schemas.LoginData, db: Session = Depends(get_db)):
-    
-
-    admin = db.query(models.Admin).filter(models.Admin.email == form_data.email).first()
-    if not admin or not verify_password(form_data.password, admin.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
-
-    access_token = create_access_token(data={"sub": admin.email, "role": "admin", "id": admin.id})
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "admin_id": admin.id,
-        "full_name": admin.full_name
-    }
-
-
-
-
-
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 

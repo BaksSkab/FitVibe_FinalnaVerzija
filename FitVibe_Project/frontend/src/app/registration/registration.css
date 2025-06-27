@@ -71,7 +71,7 @@ body, html {
   .primary-btn {
     padding: 12px;
     width: 100%;
-    background-color: #5c27fe;
+    background-color: #61c0b0;
     color: white;
     border: none;
     border-radius: 6px;
@@ -81,6 +81,48 @@ body, html {
   }
   
   .primary-btn:hover {
-    background-color: #431bc0;
+    background-color: #1bc09f;
   }
   
+  @media (max-width: 768px) {
+  .registration-wrapper {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .left-panel,
+  .form-panel {
+    flex: none;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+  }
+
+  .left-panel h1 {
+    font-size: 28px;
+  }
+
+  .left-panel p {
+    font-size: 16px;
+  }
+
+  .form-panel h2 {
+    font-size: 24px;
+  }
+
+  input,
+  select,
+  .primary-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* Custom center toast */
+.custom-toast {
+  background: #2c5364 !important;
+  color: #fff !important;
+  font-size: 18px;
+  text-align: center;
+}
