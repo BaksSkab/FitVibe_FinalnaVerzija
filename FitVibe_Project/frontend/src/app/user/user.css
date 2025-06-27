@@ -128,3 +128,75 @@ html, body {
 .edit-button:hover {
   background-color: #0891b2;
 }
+
+/* Novi stilovi za detaljni prikaz plana u okviru na sredini */
+.plan-detail-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background-color: #1e293b; /* tamno plava pozadina */
+  border-radius: 15px;
+  padding: 30px 40px;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+  color: #e2e8f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Centriranje na sredinu ekrana */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+.plan-detail-container h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #60a5fa;
+  font-weight: 700;
+}
+
+.plan-detail-container p {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+.plan-detail-container p strong {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.plan-detail-container h3 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+.plan-detail-container ul {
+  padding-left: 20px;
+}
+
+.plan-detail-container ul li {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.plan-detail-container button.edit-button {
+  background-color: #0ea5e9;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.plan-detail-container button.edit-button:hover {
+  background-color: #0284c7;
+}

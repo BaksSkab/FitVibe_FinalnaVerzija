@@ -12,6 +12,10 @@ export default function UserPage() {
   const [myPlans, setMyPlans] = useState([]);
   const [progress, setProgress] = useState([]);
 
+  // Novi state za prikaz detalja plana
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPlanDetails, setShowPlanDetails] = useState(false);
+
   const router = useRouter();
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -88,6 +92,24 @@ export default function UserPage() {
     }
   };
 
+  // Dohvat detalja pojedinog plana
+  const showPlanDetailsHandler = async (planId) => {
+    try {
+      const res = await fetch(`http://localhost:8000/user/plans/${planId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        toast.error("Failed to load plan details");
+        return;
+      }
+      const data = await res.json();
+      setSelectedPlan(data);
+      setShowPlanDetails(true);
+    } catch (error) {
+      toast.error("Server error");
+    }
+  };
+
   const handleEditProfile = () => {
     router.push("/user/profile");
   };
@@ -101,6 +123,42 @@ export default function UserPage() {
     router.push("/login");
   };
 
+  // Prikaz detalja plana (koristi polja iz selectedPlan.trainer_plan)
+  if (showPlanDetails && selectedPlan) {
+  const plan = selectedPlan.trainer_plan;
+  return (
+    <div className="plan-detail-container">
+      <button
+        onClick={() => {
+          setShowPlanDetails(false);
+          setSelectedPlan(null);
+        }}
+        className="edit-button"
+      >
+        ← Back to plans
+      </button>
+      <h2>{plan.plan_name}</h2>
+      <p>{plan.description}</p>
+      <p><strong>Level:</strong> {plan.level}</p>
+      <p><strong>Goal:</strong> {plan.goal}</p>
+      <p><strong>Trainer:</strong> {plan.trainer ? `${plan.trainer.first_name} ${plan.trainer.last_name}` : "Unknown"}</p>
+      <h3>Workouts:</h3>
+      {plan.workouts && plan.workouts.length > 0 ? (
+        <ul>
+          {plan.workouts.map(w => (
+            <li key={w.id}>
+              <strong>{w.title}</strong> - {w.description} ({w.repetitions} reps)
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No workouts assigned to this plan.</p>
+      )}
+    </div>
+  );
+}
+
+  // Standardni prikaz liste korisnika i planova
   return (
     <div className="user-container">
       <div className="user-header">
@@ -118,21 +176,27 @@ export default function UserPage() {
         <h2>📋 Your Subscribed Plans</h2>
         <div className="plan-grid">
           {myPlans.map(plan => plan.trainer_plan ? (
-            <div key={plan.id} className="plan-card">
+            <div
+              key={plan.id}
+              className="plan-card"
+              style={{ cursor: "pointer" }}
+              onClick={() => showPlanDetailsHandler(plan.trainer_plan.id)}
+            >
               <h3>{plan.trainer_plan.plan_name}</h3>
               <p>{plan.trainer_plan.description}</p>
               <p><strong>Level:</strong> {plan.trainer_plan.level}</p>
               <p><strong>Goal:</strong> {plan.trainer_plan.goal}</p>
-              <p>
-                <strong>Trainer:</strong> {
-                  plan.trainer_plan.trainer
-                    ? `${plan.trainer_plan.trainer.first_name} ${plan.trainer_plan.trainer.last_name}`
-                    : "Unknown"
-                }
-              </p>
+              <p><strong>Trainer:</strong> {
+                plan.trainer_plan.trainer
+                  ? `${plan.trainer_plan.trainer.first_name} ${plan.trainer_plan.trainer.last_name}`
+                  : "Unknown"
+              }</p>
               <button
-                className="edit-button"
-                onClick={() => handleUnsubscribe(plan.trainer_plan.id)}
+                className="edit-button unsubscribe-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUnsubscribe(plan.trainer_plan.id);
+                }}
               >
                 Unsubscribe
               </button>
